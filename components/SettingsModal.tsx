@@ -57,7 +57,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative w-full max-w-4xl bg-cine-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      {/* Changed max-w-4xl to max-w-[95vw] and set height to h-[90vh] for full page experience */}
+      <div className="relative w-full max-w-[95vw] h-[90vh] bg-cine-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700 bg-slate-800/50">
           <h2 className="text-xl font-serif font-bold text-white flex items-center gap-2">
@@ -103,7 +104,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           ) : (
             <div className="space-y-4 h-full flex flex-col">
-              <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-2">
+              <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-2 flex-shrink-0">
                 <h4 className="text-yellow-500 font-bold text-sm mb-1">变量说明</h4>
                 <p className="text-gray-400 text-xs leading-relaxed">
                   请保留以下变量以确保正确注入用户数据：
@@ -120,7 +121,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <textarea
                   value={template}
                   onChange={(e) => setTemplate(e.target.value)}
-                  className="w-full h-full p-4 bg-slate-950 text-gray-300 font-mono text-xs leading-relaxed border border-slate-700 rounded-lg focus:ring-1 focus:ring-cine-gold outline-none resize-none custom-scrollbar"
+                  className="w-full h-full p-6 bg-slate-950 text-gray-300 font-mono text-sm leading-relaxed border border-slate-700 rounded-lg focus:ring-1 focus:ring-cine-gold outline-none resize-none custom-scrollbar shadow-inner"
                   spellCheck="false"
                 />
               </div>
