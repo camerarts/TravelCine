@@ -9,16 +9,24 @@ interface InputGroupProps {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  variableHint?: string;
 }
 
 export const InputGroup: React.FC<InputGroupProps> = ({ 
-  label, id, type = "text", value, onChange, placeholder, required = false, className = "" 
+  label, id, type = "text", value, onChange, placeholder, required = false, className = "", variableHint 
 }) => {
   return (
     <div className={`flex flex-col space-y-2 ${className}`}>
-      <label htmlFor={id} className="text-sm font-medium text-gray-300">
-        {label}
-      </label>
+      <div className="flex justify-between items-center">
+        <label htmlFor={id} className="text-sm font-medium text-gray-300">
+          {label}
+        </label>
+        {variableHint && (
+          <code className="text-[10px] font-mono text-cine-gold/70 bg-cine-gold/10 px-1.5 py-0.5 rounded border border-cine-gold/10 select-all" title="对应后台模板变量">
+            {variableHint}
+          </code>
+        )}
+      </div>
       <input
         type={type}
         id={id}

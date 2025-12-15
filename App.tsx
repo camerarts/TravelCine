@@ -4,7 +4,7 @@ import { AppState, PosterFormData, LocationData } from './types';
 import { InputGroup } from './components/InputGroup';
 import { LoadingScreen } from './components/LoadingScreen';
 import { buildPrompt, DEFAULT_PROMPT_TEMPLATE } from './constants';
-import { SettingsModal } from './components/SettingsModal';
+import { SettingsPage } from './components/SettingsPage';
 
 const DEFAULT_LOCATIONS: [LocationData, LocationData, LocationData] = [
   { name: "", date: "" },
@@ -12,15 +12,17 @@ const DEFAULT_LOCATIONS: [LocationData, LocationData, LocationData] = [
   { name: "", date: "" }
 ];
 
+type ViewState = 'HOME' | 'SETTINGS';
+
 const App: React.FC = () => {
+  const [view, setView] = useState<ViewState>('HOME');
   const [appState, setAppState] = useState<AppState>(AppState.IDLE);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [currentPrompt, setCurrentPrompt] = useState<string>("");
   const [copySuccess, setCopySuccess] = useState(false);
   
-  // Settings & Template State
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  // Template State
   const [promptTemplate, setPromptTemplate] = useState<string>(DEFAULT_PROMPT_TEMPLATE);
 
   // Load saved template on mount
@@ -106,6 +108,18 @@ const App: React.FC = () => {
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
+  // Render Settings View if active
+  if (view === 'SETTINGS') {
+    return (
+      <SettingsPage 
+        onBack={() => setView('HOME')}
+        currentTemplate={promptTemplate}
+        onSaveTemplate={handleSaveTemplate}
+      />
+    );
+  }
+
+  // Render Home View
   return (
     <div className="min-h-screen relative overflow-x-hidden bg-cine-900 text-slate-200">
       {/* Background Ambience */}
@@ -115,13 +129,6 @@ const App: React.FC = () => {
       </div>
 
       {appState === AppState.GENERATING && <LoadingScreen />}
-
-      <SettingsModal 
-        isOpen={isSettingsOpen} 
-        onClose={() => setIsSettingsOpen(false)}
-        currentTemplate={promptTemplate}
-        onSaveTemplate={handleSaveTemplate}
-      />
 
       {/* Navbar */}
       <nav className="sticky top-0 z-50 w-full border-b border-white/10 glass-panel shadow-md">
@@ -138,7 +145,7 @@ const App: React.FC = () => {
             
             {/* Settings Button */}
             <button 
-              onClick={() => setIsSettingsOpen(true)}
+              onClick={() => setView('SETTINGS')}
               className="p-2 text-gray-400 hover:text-cine-gold transition-colors rounded-full hover:bg-white/5"
               title="设置"
             >
@@ -170,6 +177,7 @@ const App: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <InputGroup 
                 label="旅行主题 (中文)" 
+                variableHint="{{title}}"
                 id="title" 
                 value={formData.title} 
                 onChange={(e) => setFormData({...formData, title: e.target.value})} 
@@ -178,6 +186,7 @@ const App: React.FC = () => {
               />
               <InputGroup 
                 label="旅行主题 (英文)" 
+                variableHint="{{englishTitle}}"
                 id="enTitle" 
                 value={formData.englishTitle} 
                 onChange={(e) => setFormData({...formData, englishTitle: e.target.value})} 
@@ -192,12 +201,15 @@ const App: React.FC = () => {
                 <span className="w-5 h-5 rounded-full bg-cine-gold text-cine-900 flex items-center justify-center text-xs font-bold mr-2">📍</span>
                 行程安排 (3个站点)
               </h3>
-              <p className="text-xs text-gray-500 mb-2">日期将自动计算海报的行程范围。</p>
+              <p className="text-xs text-gray-500 mb-2">
+                日期将自动计算海报的行程范围 <code className="text-[10px] font-mono text-cine-gold/70 bg-cine-gold/10 px-1 py-0.5 rounded border border-cine-gold/10 ml-1">{'{{dateRange}}'}</code>。
+              </p>
               {[0, 1, 2].map((i) => (
                 <div key={i} className="grid grid-cols-3 gap-3">
                    <InputGroup 
                       className="col-span-2"
                       label={`第 ${i+1} 站名称`} 
+                      variableHint={`{{loc${i+1}_name}}`}
                       id={`loc${i}`} 
                       value={formData.locations[i as 0|1|2].name} 
                       onChange={(e) => handleLocationChange(i as 0|1|2, 'name', e.target.value)} 
@@ -207,6 +219,7 @@ const App: React.FC = () => {
                     <InputGroup 
                       className="col-span-1"
                       label="日期" 
+                      variableHint={`{{loc${i+1}_date}}`}
                       id={`date${i}`} 
                       type="date"
                       value={formData.locations[i as 0|1|2].date} 
